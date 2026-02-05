@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanban Board</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI, Arial;
+}
+
+body{
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  min-height:100vh;
+  color:#fff;
+}
+
+/* HEADER */
+header{
+  background:linear-gradient(90deg,#2563eb,#22c55e);
+  padding:30px 20px;
+  text-align:center;
+}
+header h1{
+  font-size:32px;
+}
+header p{
+  opacity:.9;
+}
+
+/* INPUT BAR */
+.controls{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin:30px 15px;
+  flex-wrap:wrap;
+}
+.controls input{
+  width:280px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+}
+.controls select{
+  padding:12px;
+  border-radius:10px;
+  border:none;
+}
+.controls button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:#22c55e;
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* BOARD */
+.board{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+  padding:30px;
+}
+
+/* COLUMN */
+.column{
+  background:#020617cc;
+  border-radius:18px;
+  padding:20px;
+  min-height:300px;
+  box-shadow:0 0 30px #000;
+}
+.column h2{
+  display:flex;
+  justify-content:space-between;
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+.todo h2{background:#fb7185}
+.doing h2{background:#fbbf24;color:#000}
+.done h2{background:#4ade80;color:#000}
+
+.count{
+  background:#000;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+/* TASK */
+.task{
+  background:#111827;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  cursor:grab;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.task span{
+  flex:1;
+}
+.task button{
+  background:none;
+  border:none;
+  color:#fb7185;
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:20px;
+  opacity:.8;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  header h1{font-size:24px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Kanban Board</h1>
+  <p>Add • Edit • Delete • Drag & Drop</p>
+</header>
+
+<div class="controls">
+  <input id="taskInput" placeholder="Enter task...">
+  <select id="status">
+    <option value="todo">To Do</option>
+    <option value="doing">Doing</option>
+    <option value="done">Done</option>
+  </select>
+  <button onclick="addTask()">Add Task</button>
+</div>
+
+<div class="board">
+  <div class="column todo" ondragover="allowDrop(event)" ondrop="drop(event,'todo')">
+    <h2>To Do <span class="count" id="todoCount">0</span></h2>
+    <div id="todo"></div>
+  </div>
+
+  <div class="column doing" ondragover="allowDrop(event)" ondrop="drop(event,'doing')">
+    <h2>Doing <span class="count" id="doingCount">0</span></h2>
+    <div id="doing"></div>
+  </div>
+
+  <div class="column done" ondragover="allowDrop(event)" ondrop="drop(event,'done')">
+    <h2>Done <span class="count" id="doneCount">0</span></h2>
+    <div id="done"></div>
+  </div>
+</div>
+
+<footer>
+  Add your task and dont forget!!
+</footer>
+
+<script>
+let dragged=null;
+
+function addTask(){
+  const text=document.getElementById("taskInput").value.trim();
+  const status=document.getElementById("status").value;
+  if(!text) return;
+
+  const task=document.createElement("div");
+  task.className="task";
+  task.draggable=true;
+  task.ondragstart=e=>dragged=task;
+
+  task.innerHTML=`
+    <span contenteditable="true">${text}</span>
+    <button onclick="this.parentElement.remove();updateCounts()">✕</button>
+  `;
+
+  document.getElementById(status).appendChild(task);
+  document.getElementById("taskInput").value="";
+  updateCounts();
+}
+
+function allowDrop(e){e.preventDefault();}
+
+function drop(e,id){
+  e.preventDefault();
+  if(dragged){
+    document.getElementById(id).appendChild(dragged);
+    dragged=null;
+    updateCounts();
+  }
+}
+
+function updateCounts(){
+  todoCount.innerText=todo.children.length;
+  doingCount.innerText=doing.children.length;
+  doneCount.innerText=done.children.length;
+}
+</script>
+
+</body>
+</html>
